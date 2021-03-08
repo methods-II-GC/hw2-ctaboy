@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""This program takes a filename as input and divides a portion of its contents into three separate files."""
+"""Portions of data from conll2000.tag are split into three separate files."""
 
 
 import argparse
@@ -26,39 +26,78 @@ def main(args: argparse.Namespace) -> None:
     random.seed(a=args.seed)
     sentence = read_tags(args.input)
     corpus = list(sentence)
-    randomizedCorpus = random.shuffle(corpus)
+    randomizedCorpus = random.sample(corpus, len(corpus))
 
     eightyPercent = int(len(corpus) * 0.8)
     tenPercent = int(len(corpus) * 0.1)
 
-    trainFile = corpus[:eightyPercent]
-    devFile = corpus[eightyPercent:eightyPercent+tenPercent]
-    testFile = corpus[eightyPercent+tenPercent:]
+    trainFile = randomizedCorpus[: eightyPercent]
+    devFile = randomizedCorpus[eightyPercent: eightyPercent + tenPercent]
+    testFile = randomizedCorpus[eightyPercent + tenPercent:]
 
-    random.shuffle(trainFile)
-    random.shuffle(devFile)
-    random.shuffle(testFile)
-
+    trainTokens = 0
     f = open(args.train, "w")
-    for i in trainFile:
-        f.write(str(i) + "\n")
-        
-    f = open(args.dev, "w")
-    for i in devFile:
-        f.write(str(i) + "\n")
+    for sent in trainFile:
+        f.write(str(sent) + "\n")
+        for tok in sent:
+            trainTokens += 1
 
+    devTokens = 0
+    f = open(args.dev, "w")
+    for sent in devFile:
+        f.write(str(sent) + "\n")
+        for tok in sent:
+            devTokens += 1
+
+    testTokens = 0
     f = open(args.test, "w")
-    for i in testFile:
-        f.write(str(i) + "\n")
-    
+    for sent in testFile:
+        f.write(str(sent) + "\n")
+        for tok in sent:
+            testTokens += 1
+
+    corpusTokens = 0
+    for sent in corpus:  # each sentence
+        for tok in sent:  # each token in sentence
+            corpusTokens += 1
+
+    print(
+        f"{args.train} \n \t"
+        f"Number of sentences: {len(trainFile)} \n \t"
+        f"Number of tokens: {trainTokens}"
+    )
+    print(
+        f"{args.dev} \n \t"
+        f"Number of sentences: {len(devFile)} \n \t"
+        f"Number of tokens: {devTokens}"
+    )
+    print(
+        f"{args.test} \n \t"
+        f"Number of sentences: {len(testFile)} \n \t"
+        f"Number of tokens: {testTokens}"
+    )
+    print(
+        f"{args.input} \n \t"
+        f"Total number of sentences: {len(corpus)} \n \t"
+        f"Total number of tokens: {corpusTokens}"
+    )
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("input", help="Enter file name for input.")
-    parser.add_argument("--seed", type=int, required = True, help="Specify a seed.")
-    parser.add_argument("train", help="Enter file name to output lines into (i.e. 'train.tag')")
-    parser.add_argument("dev", help="Enter file name to output lines into (i.e. 'dev.tag')")
-    parser.add_argument("test", help="Enter file name to output lines into (i.e. 'test.tag')")
+    parser.add_argument(
+        "--seed", type=int, required=True, help="Specify a seed."
+    )
+    parser.add_argument(
+        "train", help="Enter file name to output lines into (i.e. 'train.tag')"
+    )
+    parser.add_argument(
+        "dev", help="Enter file name to output lines into (i.e. 'dev.tag')"
+    )
+    parser.add_argument(
+        "test", help="Enter file name to output lines into (i.e. 'test.tag')"
+    )
 
     args = parser.parse_args()
     main(args)
