@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-"""Portions of data from conll2000.tag are split into three separate files."""
-
+"""Splits portions of data from 'conll2000.tag' into three separate files."""
 
 import argparse
 import random
@@ -24,8 +23,7 @@ def read_tags(path: str) -> Iterator[List[List[str]]]:
 
 def main(args: argparse.Namespace) -> None:
     random.seed(a=args.seed)
-    sentence = read_tags(args.input)
-    corpus = list(sentence)
+    corpus = list(read_tags(args.input))
     randomizedCorpus = random.sample(corpus, len(corpus))
 
     eightyPercent = int(len(corpus) * 0.8)
@@ -57,8 +55,8 @@ def main(args: argparse.Namespace) -> None:
             testTokens += 1
 
     corpusTokens = 0
-    for sent in corpus:  # each sentence
-        for tok in sent:  # each token in sentence
+    for sent in corpus:
+        for tok in sent:
             corpusTokens += 1
 
     print(
@@ -77,7 +75,7 @@ def main(args: argparse.Namespace) -> None:
         f"Number of tokens: {testTokens}"
     )
     print(
-        f"{args.input} \n \t"
+        f"{args.input} (main input) \n \t"
         f"Total number of sentences: {len(corpus)} \n \t"
         f"Total number of tokens: {corpusTokens}"
     )
